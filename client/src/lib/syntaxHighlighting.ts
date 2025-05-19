@@ -51,24 +51,34 @@ export const lightTheme = EditorView.theme({
   },
 });
 
-// Create our custom highlighting style
+// Create our custom highlighting style with more relaxed colors
 const customHighlightStyle = HighlightStyle.define([
-  { tag: t.keyword, color: "#d946ef", fontWeight: "bold" },        // Purple for keywords
-  { tag: t.operator, color: "#f59e0b" },                           // Amber for operators
-  { tag: t.function, color: "#10b981", fontWeight: "bold" },       // Green for functions
-  { tag: t.string, color: "#6366f1" },                             // Indigo for strings
-  { tag: t.comment, color: "#64748b", fontStyle: "italic" },       // Slate for comments
-  { tag: t.variableName, color: "#334155" },                       // Dark slate for variables
-  { tag: t.number, color: "#ea580c" },                             // Orange for numbers
-  { tag: t.className, color: "#7c3aed", fontWeight: "bold" },      // Purple for global variables
+  { tag: t.keyword, color: "#5a3a94", fontWeight: "bold" },        // Muted purple for keywords
+  { tag: t.operator, color: "#575e66" },                           // Dark gray for operators
+  { tag: t.propertyName, color: "#327a5f" },                       // Softer green for properties
+  { tag: t.string, color: "#2b6cb0" },                             // Muted blue for strings
+  { tag: t.comment, color: "#6e7781", fontStyle: "italic" },       // Gray for comments
+  { tag: t.variableName, color: "#24292f" },                       // Dark slate for variables
+  { tag: t.number, color: "#7d4e31" },                             // Muted brown for numbers
+  { tag: t.className, color: "#5a3a94" },                          // Muted purple for globals
+  { tag: t.punctuation, color: "#575e66" },                        // Dark gray for punctuation
 ]);
 
 // Create syntax highlighting extension with our custom style
 export const customSyntaxHighlighting = syntaxHighlighting(customHighlightStyle);
 
 // Define our keywords, operators, and other tokens
-export const keywords = ["if", "elif", "else", "func", "let", "glob", "return", "print"];
-export const operators = ["+", "-", "*", "/", "=", "==", "!=", ">", "<", ">=", "<="];
+export const keywords = [
+  "if", "elif", "else", "func", "let", "glob", "return", "print",
+  "for", "each", "to", "by", "in", "while", "do", "break", 
+  "walkAll", "color", "var", "glob", "let"
+];
+
+export const operators = [
+  "+", "-", "*", "/", "^", "||", "&&", "|", "&", "~",
+  "==", "!=", "===", "!==", "<", "<=", ">", ">=", "<<", ">>", 
+  "_", ":", "::", "(", ")", "[", "]", "{", "}", "=", ".", ",", "?", "!", "->"
+];
 
 // Create a custom language for syntax highlighting
 export const customLanguage = StreamLanguage.define({
@@ -88,8 +98,8 @@ export const customLanguage = StreamLanguage.define({
       return "string";
     }
     
-    // Handle keywords
-    if (stream.match(/^(if|elif|else|func|let|glob|return|print)\b/)) {
+    // Handle keywords - updated with all new keywords
+    if (stream.match(/^(if|elif|else|func|let|glob|return|print|for|each|to|by|in|while|do|break|walkAll|color|var)\b/)) {
       return "keyword";
     }
     
@@ -103,8 +113,8 @@ export const customLanguage = StreamLanguage.define({
       return "number";
     }
     
-    // Handle operators
-    if (stream.match(/[+\-*\/=<>!]=?|&&|\|\|/)) {
+    // Handle operators - updated with all new operators
+    if (stream.match(/[+\-*\/\^=<>!&|~_:.]|===|!==|==|!=|<=|>=|<<|>>|&&|\|\||->|::|[\(\)\[\]\{\},?!]/)) {
       return "operator";
     }
     
