@@ -25,8 +25,8 @@ export default function EditorContent({
         extensions: [
           basicSetup,
           lightTheme,
-          customSyntaxHighlighting,
           customLanguage,
+          customSyntaxHighlighting,
           lineNumbers({
             formatNumber: (lineNo) => {
               return String(lineNo);
@@ -77,7 +77,7 @@ export default function EditorContent({
   }, [code]);
 
   return (
-    <div className="h-full w-full bg-[#f0f0f0]">
+    <div className="h-full w-full bg-[#f8f9fa]">
       <div 
         className="h-full w-full"
         ref={editorRef}

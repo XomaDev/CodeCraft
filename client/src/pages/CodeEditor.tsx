@@ -18,6 +18,37 @@ export default function CodeEditor() {
   // Example of using global variables
   glob MAX_VALUE = 100
   
+  // Math functions
+  let radius = 5
+  let area = 3.14 * radius ^ 2
+  let circumference = 2 * 3.14 * radius
+  
+  // Using math functions
+  let angle = 45
+  let sinValue = sin(angle)
+  let cosValue = cos(angle)
+  let tanValue = tan(angle)
+  let roundedValue = round(3.14159)
+  
+  // Example of built-in functions
+  let rng = randInt(1, 100)
+  let minValue = min(x, y)
+  let maxValue = max(x, y)
+  
+  // Type identifiers
+  let n = number
+  let t = text
+  let l = list
+  
+  // Method calls
+  let message = "Hello, World!"
+  let contains = message.contains("Hello")
+  let split = message.split(",")
+  
+  // Property access
+  let length = message.textLen
+  let uppercase = message.upper
+  
   func calculate(a, b) {
     let sum = a + b
     let diff = a - b
