@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import EditorHeader from "@/components/editor/EditorHeader";
 import EditorContent from "@/components/editor/EditorContent";
-import EditorStatusBar from "@/components/editor/EditorStatusBar";
 
 export default function CodeEditor() {
   const [code, setCode] = useState<string>(`func main() {
@@ -29,73 +27,21 @@ export default function CodeEditor() {
   }
 }`);
   
-  const [fileName, setFileName] = useState<string>("untitled.txt");
-  const [cursorPosition, setCursorPosition] = useState<{line: number, ch: number}>({line: 0, ch: 0});
-  const [lineCount, setLineCount] = useState<number>(0);
-
   const handleCodeChange = (value: string) => {
     setCode(value);
-    // Count lines in the code
-    setLineCount(value.split("\n").length);
   };
   
   const handleCursorActivity = (line: number, ch: number) => {
-    setCursorPosition({ line, ch });
+    // We're not displaying cursor position anymore
   };
-  
-  const handleNewFile = () => {
-    if (window.confirm("Create a new file? Any unsaved changes will be lost.")) {
-      setCode("");
-      setFileName("untitled.txt");
-    }
-  };
-  
-  const handleOpenFile = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    
-    const file = files[0];
-    const reader = new FileReader();
-    
-    reader.onload = (e) => {
-      if (e.target && typeof e.target.result === "string") {
-        setCode(e.target.result);
-        setFileName(file.name);
-      }
-    };
-    
-    reader.readAsText(file);
-  };
-  
-  const handleSaveFile = () => {
-    const blob = new Blob([code], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-  
-  useEffect(() => {
-    // Initial line count
-    setLineCount(code.split("\n").length);
-  }, []);
 
   return (
-    <div className="flex flex-col h-screen">
-      <EditorHeader 
-        fileName={fileName} 
-        cursorPosition={cursorPosition} 
-        onNewFile={handleNewFile}
-        onOpenFile={handleOpenFile}
-        onSaveFile={handleSaveFile}
-      />
+    <div className="h-screen">
       <EditorContent 
         code={code} 
         onChange={handleCodeChange} 
         onCursorActivity={handleCursorActivity} 
       />
-      <EditorStatusBar lineCount={lineCount} />
     </div>
   );
 }

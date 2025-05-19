@@ -1,21 +1,12 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import { EditorView } from "@codemirror/view";
-
-// Define custom token types for our specific language elements
-const customTags = {
-  keyword: t.keyword,
-  operator: t.operator,
-  function: t.function,
-  string: t.string,
-  comment: t.comment,
-  variable: t.variableName,
-};
+import { StreamLanguage } from "@codemirror/language";
 
 // Create a light theme
 export const lightTheme = EditorView.theme({
   "&": {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f8f9fa",
     color: "#334155",
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: "14px",
@@ -62,38 +53,70 @@ export const lightTheme = EditorView.theme({
 
 // Create our custom highlighting style
 const customHighlightStyle = HighlightStyle.define([
-  {
-    tag: customTags.keyword,
-    color: "#d946ef", // Purple for keywords
-  },
-  {
-    tag: customTags.operator,
-    color: "#f59e0b", // Amber for operators
-  },
-  {
-    tag: customTags.function,
-    color: "#10b981", // Green for functions
-  },
-  {
-    tag: customTags.string,
-    color: "#6366f1", // Indigo for strings
-  },
-  {
-    tag: customTags.comment,
-    color: "#64748b", // Slate for comments
-    fontStyle: "italic",
-  },
-  {
-    tag: customTags.variable,
-    color: "#334155", // Dark slate for variables (regular text color)
-  },
+  { tag: t.keyword, color: "#d946ef", fontWeight: "bold" },        // Purple for keywords
+  { tag: t.operator, color: "#f59e0b" },                           // Amber for operators
+  { tag: t.function, color: "#10b981", fontWeight: "bold" },       // Green for functions
+  { tag: t.string, color: "#6366f1" },                             // Indigo for strings
+  { tag: t.comment, color: "#64748b", fontStyle: "italic" },       // Slate for comments
+  { tag: t.variableName, color: "#334155" },                       // Dark slate for variables
+  { tag: t.number, color: "#ea580c" },                             // Orange for numbers
+  { tag: t.className, color: "#7c3aed", fontWeight: "bold" },      // Purple for global variables
 ]);
 
 // Create syntax highlighting extension with our custom style
 export const customSyntaxHighlighting = syntaxHighlighting(customHighlightStyle);
 
-// Custom language specific tokens for our keywords
-export const keywords = ["if", "elif", "else", "func", "let", "glob", "return"];
+// Define our keywords, operators, and other tokens
+export const keywords = ["if", "elif", "else", "func", "let", "glob", "return", "print"];
 export const operators = ["+", "-", "*", "/", "=", "==", "!=", ">", "<", ">=", "<="];
 
-// This would be expanded in a real implementation to do proper tokenization for our language
+// Create a custom language for syntax highlighting
+export const customLanguage = StreamLanguage.define({
+  token(stream, state) {
+    // Handle comments
+    if (stream.match("//")) {
+      stream.skipToEnd();
+      return "comment";
+    }
+    
+    // Handle strings
+    if (stream.match(/"/) || stream.match(/'/)) {
+      const quote = stream.string.charAt(stream.pos - 1);
+      while (!stream.eol()) {
+        if (stream.next() === quote && stream.string.charAt(stream.pos - 2) !== "\\") break;
+      }
+      return "string";
+    }
+    
+    // Handle keywords
+    if (stream.match(/^(if|elif|else|func|let|glob|return|print)\b/)) {
+      return "keyword";
+    }
+    
+    // Handle function definitions
+    if (stream.match(/^func\s+([a-zA-Z_][a-zA-Z0-9_]*)/)) {
+      return "function";
+    }
+    
+    // Handle numbers
+    if (stream.match(/^-?\d+(\.\d+)?/)) {
+      return "number";
+    }
+    
+    // Handle operators
+    if (stream.match(/[+\-*\/=<>!]=?|&&|\|\|/)) {
+      return "operator";
+    }
+    
+    // Handle variables
+    if (stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/)) {
+      return "variable";
+    }
+    
+    stream.next();
+    return null;
+  },
+  startState() {
+    return {};
+  }
+});

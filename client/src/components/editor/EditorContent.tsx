@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
 import { basicSetup } from "codemirror";
-import { EditorState, StateEffect } from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 import { EditorView, lineNumbers } from "@codemirror/view";
-import { lightTheme } from "@/lib/syntaxHighlighting";
-import { customSyntaxHighlighting } from "@/lib/syntaxHighlighting";
+import { lightTheme, customSyntaxHighlighting, customLanguage } from "@/lib/syntaxHighlighting";
 
 interface EditorContentProps {
   code: string;
@@ -27,6 +26,7 @@ export default function EditorContent({
           basicSetup,
           lightTheme,
           customSyntaxHighlighting,
+          customLanguage,
           lineNumbers({
             formatNumber: (lineNo) => {
               return String(lineNo);
@@ -51,6 +51,9 @@ export default function EditorContent({
       });
       
       viewRef.current = view;
+      
+      // Focus on the editor when it's loaded
+      view.focus();
     }
 
     return () => {
@@ -74,11 +77,11 @@ export default function EditorContent({
   }, [code]);
 
   return (
-    <main className="flex-1 flex overflow-hidden">
+    <div className="h-full w-full bg-[#f0f0f0]">
       <div 
-        className="relative flex-1 overflow-auto bg-[#f0f0f0]"
+        className="h-full w-full"
         ref={editorRef}
       />
-    </main>
+    </div>
   );
 }
