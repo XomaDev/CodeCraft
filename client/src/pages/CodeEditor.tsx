@@ -58,6 +58,8 @@ export default function CodeEditor() {
   }
 }`);
   
+  const [inputValue, setInputValue] = useState<string>("");
+  
   const handleCodeChange = (value: string) => {
     setCode(value);
   };
@@ -66,13 +68,30 @@ export default function CodeEditor() {
     // We're not displaying cursor position anymore
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+  };
+
   return (
-    <div className="h-screen">
-      <EditorContent 
-        code={code} 
-        onChange={handleCodeChange} 
-        onCursorActivity={handleCursorActivity} 
-      />
+    <div className="h-screen flex flex-col">
+      {/* Code Editor - 70% of the screen height */}
+      <div className="h-[70%]">
+        <EditorContent 
+          code={code} 
+          onChange={handleCodeChange} 
+          onCursorActivity={handleCursorActivity} 
+        />
+      </div>
+      
+      {/* Input Area - 30% of the screen height */}
+      <div className="h-[30%] p-2 bg-[#f0f0f0] border-t border-gray-300">
+        <textarea
+          className="w-full h-full p-3 bg-white border border-gray-200 rounded font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+          placeholder="Input area..."
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+      </div>
     </div>
   );
 }
