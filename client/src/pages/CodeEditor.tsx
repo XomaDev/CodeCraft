@@ -73,8 +73,8 @@ export default function CodeEditor() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showApiKey, setShowApiKey] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("prompt");
-  const [useAzure, setUseAzure] = useState<boolean>(false);
-  const [azureEndpoint, setAzureEndpoint] = useState<string>("");
+  const [useAzure, setUseAzure] = useState<boolean>(true); // Default to Azure
+  const [azureEndpoint, setAzureEndpoint] = useState<string>("https://mistai2.openai.azure.com");
   const [azureDeploymentName, setAzureDeploymentName] = useState<string>("");
   const [azureApiVersion, setAzureApiVersion] = useState<string>("2023-05-15");
   
@@ -283,25 +283,27 @@ export default function CodeEditor() {
                     {/* API Provider Selection */}
                     <div className="space-y-2">
                       <Label htmlFor="apiProvider" className="text-gray-700 font-medium">API Provider</Label>
-                      <div className="flex items-center justify-between border p-3 rounded-md">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${useAzure ? 'bg-gray-300' : 'bg-blue-600'}`}></div>
-                          <span className="text-sm">OpenAI API</span>
+                      <div className="flex flex-col space-y-2">
+                        <div 
+                          className={`flex items-center justify-between border p-3 rounded-md cursor-pointer ${!useAzure ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+                          onClick={() => setUseAzure(false)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-4 h-4 rounded-full ${!useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                            <span className="text-sm font-medium">OpenAI API</span>
+                          </div>
+                          <span className="text-xs text-gray-500">Use with standard OpenAI API keys</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded-full ${useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
-                          <span className="text-sm">Azure OpenAI</span>
-                        </div>
-                        <div className="relative inline-block w-10 align-middle select-none">
-                          <input 
-                            type="checkbox" 
-                            checked={useAzure}
-                            onChange={handleToggleUseAzure}
-                            className="sr-only"
-                            id="azure-toggle"
-                          />
-                          <div className="block h-6 bg-gray-200 rounded-full w-10"></div>
-                          <div className={`absolute left-0.5 top-0.5 block w-5 h-5 rounded-full bg-white shadow transform transition-transform ${useAzure ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                        
+                        <div 
+                          className={`flex items-center justify-between border p-3 rounded-md cursor-pointer ${useAzure ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+                          onClick={() => setUseAzure(true)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-4 h-4 rounded-full ${useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                            <span className="text-sm font-medium">Azure OpenAI</span>
+                          </div>
+                          <span className="text-xs text-gray-500">Use with Azure OpenAI endpoints</span>
                         </div>
                       </div>
                     </div>
