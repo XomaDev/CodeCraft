@@ -73,6 +73,10 @@ export default function CodeEditor() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showApiKey, setShowApiKey] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("prompt");
+  const [useAzure, setUseAzure] = useState<boolean>(false);
+  const [azureEndpoint, setAzureEndpoint] = useState<string>("");
+  const [azureDeploymentName, setAzureDeploymentName] = useState<string>("");
+  const [azureApiVersion, setAzureApiVersion] = useState<string>("2023-05-15");
   
   const { toast } = useToast();
   
@@ -91,6 +95,18 @@ export default function CodeEditor() {
   const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(e.target.value);
   };
+
+  const handleAzureEndpointChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAzureEndpoint(e.target.value);
+  };
+
+  const handleAzureDeploymentNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAzureDeploymentName(e.target.value);
+  };
+
+  const handleAzureApiVersionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAzureApiVersion(e.target.value);
+  };
   
   const handleModelChange = (value: string) => {
     setSelectedModel(value);
@@ -100,8 +116,23 @@ export default function CodeEditor() {
     setShowApiKey(!showApiKey);
   };
 
+  const handleToggleUseAzure = () => {
+    setUseAzure(!useAzure);
+  };
+
   const generateCode = async () => {
-    if (!apiKey) {
+    // Validate API key or Azure settings
+    if (useAzure) {
+      if (!apiKey || !azureEndpoint || !azureDeploymentName) {
+        toast({
+          title: "Azure OpenAI Settings Required",
+          description: "Please enter your Azure OpenAI API key, endpoint, and deployment name.",
+          variant: "destructive",
+        });
+        setActiveTab("settings");
+        return;
+      }
+    } else if (!apiKey) {
       toast({
         title: "API Key Required",
         description: "Please enter your OpenAI API key in the settings tab.",
@@ -123,32 +154,47 @@ export default function CodeEditor() {
     try {
       setIsLoading(true);
       
-      // Create OpenAI client with the API key
-      const openai = new OpenAI({ 
-        apiKey,
-        dangerouslyAllowBrowser: true // Allowing browser usage as requested
-      });
+      let openaiClient;
       
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      const response = await openai.chat.completions.create({
-        model: selectedModel,
+      // Create OpenAI client with the API key - either standard or Azure
+      if (useAzure) {
+        openaiClient = new OpenAI({
+          apiKey: apiKey,
+          baseURL: `${azureEndpoint}/openai/deployments/${azureDeploymentName}`,
+          defaultQuery: { 'api-version': azureApiVersion },
+          defaultHeaders: { 'api-key': apiKey },
+          dangerouslyAllowBrowser: true
+        });
+      } else {
+        openaiClient = new OpenAI({ 
+          apiKey,
+          dangerouslyAllowBrowser: true
+        });
+      }
+      
+      // The system prompt with language details
+      const systemPrompt = `You are an expert code generator. Generate only clean, working code without explanations or markdown formatting.
+        The code is for a custom language with the following syntax elements:
+        
+        Keywords: if, elif, else, func, let, glob, return, print, for, each, to, by, in, while, do, break
+        Math functions: root, abs, neg, log, exp, round, ceil, floor, sin, cos, tan, asin, acos, atan
+        Built-in functions: randInt, randFloat, min, max
+        Type identifiers: number, text, list, dict
+        Method calls: startsWith, contains, split, add, remove
+        Property access: textLen, trim, upper, lower, listLen, keys, values
+        
+        Operators: +, -, *, /, ^, =, <, >, !, == and other standard operators
+
+        When generating mathematical or algorithmic code, make sure to follow the syntax of this language. 
+        Do not generate code in any other language.`;
+      
+      // Send request to OpenAI
+      const response = await openaiClient.chat.completions.create({
+        model: useAzure ? azureDeploymentName : selectedModel, // For Azure, the model is specified in the deployment
         messages: [
           {
             role: "system",
-            content: `You are an expert code generator. Generate only clean, working code without explanations or markdown formatting.
-            The code is for a custom language with the following syntax elements:
-            
-            Keywords: if, elif, else, func, let, glob, return, print, for, each, to, by, in, while, do, break
-            Math functions: root, abs, neg, log, exp, round, ceil, floor, sin, cos, tan, asin, acos, atan
-            Built-in functions: randInt, randFloat, min, max
-            Type identifiers: number, text, list, dict
-            Method calls: startsWith, contains, split, add, remove
-            Property access: textLen, trim, upper, lower, listLen, keys, values
-            
-            Operators: +, -, *, /, ^, =, <, >, !, == and other standard operators
-
-            When generating mathematical or algorithmic code, make sure to follow the syntax of this language. 
-            Do not generate code in any other language.`
+            content: systemPrompt
           },
           {
             role: "user",
@@ -173,7 +219,7 @@ export default function CodeEditor() {
       console.error("Error generating code:", error);
       toast({
         title: "Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate code. Please check your API key and try again.",
+        description: error instanceof Error ? error.message : "Failed to generate code. Please check your API settings and try again.",
         variant: "destructive",
       });
     } finally {
@@ -233,44 +279,140 @@ export default function CodeEditor() {
               
               {activeTab === 'settings' && (
                 <div className="absolute inset-0 p-4 overflow-y-auto bg-white rounded border border-gray-200">
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    {/* API Provider Selection */}
                     <div className="space-y-2">
-                      <Label htmlFor="apiKey" className="text-gray-700">OpenAI API Key</Label>
-                      <div className="flex">
-                        <Input
-                          id="apiKey"
-                          type={showApiKey ? "text" : "password"}
-                          placeholder="Enter your OpenAI API key"
-                          value={apiKey}
-                          onChange={handleApiKeyChange}
-                          className="flex-1"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleToggleShowApiKey}
-                          className="ml-2"
-                        >
-                          {showApiKey ? "Hide" : "Show"}
-                        </Button>
+                      <Label htmlFor="apiProvider" className="text-gray-700 font-medium">API Provider</Label>
+                      <div className="flex items-center justify-between border p-3 rounded-md">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full ${useAzure ? 'bg-gray-300' : 'bg-blue-600'}`}></div>
+                          <span className="text-sm">OpenAI API</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full ${useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                          <span className="text-sm">Azure OpenAI</span>
+                        </div>
+                        <div className="relative inline-block w-10 align-middle select-none">
+                          <input 
+                            type="checkbox" 
+                            checked={useAzure}
+                            onChange={handleToggleUseAzure}
+                            className="sr-only"
+                            id="azure-toggle"
+                          />
+                          <div className="block h-6 bg-gray-200 rounded-full w-10"></div>
+                          <div className={`absolute left-0.5 top-0.5 block w-5 h-5 rounded-full bg-white shadow transform transition-transform ${useAzure ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="model" className="text-gray-700">Model</Label>
-                      <Select value={selectedModel} onValueChange={handleModelChange}>
-                        <SelectTrigger id="model">
-                          <SelectValue placeholder="Select a model" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
-                          <SelectItem value="gpt-4">GPT-4</SelectItem>
-                          <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                          <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Separator />
+                    
+                    {/* Standard OpenAI Settings */}
+                    {!useAzure && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="apiKey" className="text-gray-700">OpenAI API Key</Label>
+                          <div className="flex">
+                            <Input
+                              id="apiKey"
+                              type={showApiKey ? "text" : "password"}
+                              placeholder="Enter your OpenAI API key"
+                              value={apiKey}
+                              onChange={handleApiKeyChange}
+                              className="flex-1"
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleToggleShowApiKey}
+                              className="ml-2"
+                            >
+                              {showApiKey ? "Hide" : "Show"}
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="model" className="text-gray-700">Model</Label>
+                          <Select value={selectedModel} onValueChange={handleModelChange}>
+                            <SelectTrigger id="model">
+                              <SelectValue placeholder="Select a model" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
+                              <SelectItem value="gpt-4">GPT-4</SelectItem>
+                              <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                              <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Azure OpenAI Settings */}
+                    {useAzure && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="azureApiKey" className="text-gray-700">Azure API Key</Label>
+                          <div className="flex">
+                            <Input
+                              id="azureApiKey"
+                              type={showApiKey ? "text" : "password"}
+                              placeholder="Enter your Azure OpenAI API key"
+                              value={apiKey}
+                              onChange={handleApiKeyChange}
+                              className="flex-1"
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleToggleShowApiKey}
+                              className="ml-2"
+                            >
+                              {showApiKey ? "Hide" : "Show"}
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="azureEndpoint" className="text-gray-700">Azure Endpoint</Label>
+                          <Input
+                            id="azureEndpoint"
+                            type="text"
+                            placeholder="https://your-resource-name.openai.azure.com"
+                            value={azureEndpoint}
+                            onChange={handleAzureEndpointChange}
+                          />
+                          <p className="text-xs text-gray-500">Example: https://mistai2.openai.azure.com</p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="azureDeploymentName" className="text-gray-700">Deployment Name</Label>
+                          <Input
+                            id="azureDeploymentName"
+                            type="text"
+                            placeholder="Enter your model deployment name"
+                            value={azureDeploymentName}
+                            onChange={handleAzureDeploymentNameChange}
+                          />
+                          <p className="text-xs text-gray-500">The name of your deployed model in Azure</p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="azureApiVersion" className="text-gray-700">API Version</Label>
+                          <Input
+                            id="azureApiVersion"
+                            type="text"
+                            placeholder="2023-05-15"
+                            value={azureApiVersion}
+                            onChange={handleAzureApiVersionChange}
+                          />
+                          <p className="text-xs text-gray-500">Latest version is 2023-05-15</p>
+                        </div>
+                      </>
+                    )}
                     
                     <div className="pt-4">
                       <Button 
