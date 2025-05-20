@@ -219,196 +219,199 @@ export default function CodeEditor() {
       </div>
       
       {/* Input Area - 30% of the screen height */}
-      <div className="h-[30%] border-t border-gray-300">
-        {/* Full-width prompt/settings area */}
-        <div className="w-full p-2 bg-[#f0f0f0]">
-          <div className="w-full h-full flex flex-col">
-            <div className="flex border-b border-gray-300">
-              <button 
-                className={`flex-1 py-2 font-medium text-sm ${activeTab === 'prompt' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-800'}`}
-                onClick={() => setActiveTab('prompt')}
-              >
-                Prompt
-              </button>
-              <button 
-                className={`flex-1 py-2 font-medium text-sm ${activeTab === 'settings' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-800'}`}
-                onClick={() => setActiveTab('settings')}
-              >
-                Settings
-              </button>
+      <div className="h-[30%] border-t border-gray-300 flex flex-col">
+        {/* Tab navigation */}
+        <div className="flex border-b border-gray-300 bg-gray-100">
+          <button 
+            className={`px-6 py-3 font-medium ${activeTab === 'prompt' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'}`}
+            onClick={() => setActiveTab('prompt')}
+          >
+            Prompt
+          </button>
+          <button 
+            className={`px-6 py-3 font-medium ${activeTab === 'settings' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            Settings
+          </button>
+        </div>
+        
+        {/* Tab content */}
+        <div className="flex-1 overflow-hidden">
+          {/* Prompt Tab */}
+          {activeTab === 'prompt' && (
+            <div className="h-full flex flex-col">
+              <textarea
+                className="w-full flex-1 p-4 bg-white font-mono text-sm resize-none focus:outline-none focus:ring-0 border-0"
+                placeholder="Write me a fib function..."
+                value={inputValue}
+                onChange={handleInputChange}
+              />
+              <div className="p-3 bg-gray-50 border-t border-gray-200">
+                <Button 
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                  onClick={generateCode}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Generating..." : "Generate"}
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex-1 relative">
-              {activeTab === 'prompt' && (
-                <div className="absolute inset-0 flex flex-col">
-                  <textarea
-                    className="w-full flex-1 p-3 bg-white border border-gray-200 rounded-t font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Write me a fib function..."
-                    value={inputValue}
-                    onChange={handleInputChange}
-                  />
-                  <Button 
-                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-b hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                    onClick={generateCode}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Generating..." : "Generate"}
-                  </Button>
-                </div>
-              )}
-              
-              {activeTab === 'settings' && (
-                <div className="absolute inset-0 p-4 overflow-y-auto bg-white rounded border border-gray-200">
-                  <div className="space-y-6">
-                    {/* API Provider Selection */}
-                    <div className="space-y-2">
-                      <Label htmlFor="apiProvider" className="text-gray-700 font-medium">API Provider</Label>
-                      <div className="flex flex-col space-y-2">
-                        <div 
-                          className={`flex items-center justify-between border p-3 rounded-md cursor-pointer ${!useAzure ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
-                          onClick={() => setUseAzure(false)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded-full ${!useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
-                            <span className="text-sm font-medium">OpenAI API</span>
-                          </div>
-                          <span className="text-xs text-gray-500">Use with standard OpenAI API keys</span>
-                        </div>
-                        
-                        <div 
-                          className={`flex items-center justify-between border p-3 rounded-md cursor-pointer ${useAzure ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
-                          onClick={() => setUseAzure(true)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded-full ${useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
-                            <span className="text-sm font-medium">Azure OpenAI</span>
-                          </div>
-                          <span className="text-xs text-gray-500">Use with Azure OpenAI endpoints</span>
-                        </div>
+          )}
+          
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div className="h-full bg-white p-6 overflow-y-auto">
+              <div className="max-w-3xl mx-auto space-y-8">
+                {/* API Provider Selection */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-800">API Provider</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div 
+                      className={`border p-4 rounded-lg cursor-pointer transition-all ${!useAzure ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200 hover:bg-gray-50'}`}
+                      onClick={() => setUseAzure(false)}
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className={`w-4 h-4 rounded-full mr-2 ${!useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                        <span className="font-medium">OpenAI API</span>
                       </div>
+                      <p className="text-sm text-gray-500">Use with standard OpenAI API keys</p>
                     </div>
                     
-                    <Separator />
-                    
-                    {/* Standard OpenAI Settings */}
-                    {!useAzure && (
-                      <>
-                        <div className="space-y-2">
-                          <Label htmlFor="apiKey" className="text-gray-700">OpenAI API Key</Label>
-                          <div className="flex">
-                            <Input
-                              id="apiKey"
-                              type={showApiKey ? "text" : "password"}
-                              placeholder="Enter your OpenAI API key"
-                              value={apiKey}
-                              onChange={handleApiKeyChange}
-                              className="flex-1"
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleToggleShowApiKey}
-                              className="ml-2"
-                            >
-                              {showApiKey ? "Hide" : "Show"}
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="model" className="text-gray-700">Model</Label>
-                          <Select value={selectedModel} onValueChange={handleModelChange}>
-                            <SelectTrigger id="model">
-                              <SelectValue placeholder="Select a model" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
-                              <SelectItem value="gpt-4">GPT-4</SelectItem>
-                              <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                              <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </>
-                    )}
-                    
-                    {/* Azure OpenAI Settings */}
-                    {useAzure && (
-                      <>
-                        <div className="space-y-2">
-                          <Label htmlFor="azureApiKey" className="text-gray-700">Azure API Key</Label>
-                          <div className="flex">
-                            <Input
-                              id="azureApiKey"
-                              type={showApiKey ? "text" : "password"}
-                              placeholder="Enter your Azure OpenAI API key"
-                              value={apiKey}
-                              onChange={handleApiKeyChange}
-                              className="flex-1"
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleToggleShowApiKey}
-                              className="ml-2"
-                            >
-                              {showApiKey ? "Hide" : "Show"}
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="azureEndpoint" className="text-gray-700">Azure Endpoint</Label>
-                          <Input
-                            id="azureEndpoint"
-                            type="text"
-                            placeholder="https://your-resource-name.openai.azure.com"
-                            value={azureEndpoint}
-                            onChange={handleAzureEndpointChange}
-                          />
-                          <p className="text-xs text-gray-500">Example: https://mistai2.openai.azure.com</p>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="azureDeploymentName" className="text-gray-700">Deployment Name</Label>
-                          <Input
-                            id="azureDeploymentName"
-                            type="text"
-                            placeholder="Enter your model deployment name"
-                            value={azureDeploymentName}
-                            onChange={handleAzureDeploymentNameChange}
-                          />
-                          <p className="text-xs text-gray-500">The name of your deployed model in Azure</p>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="azureApiVersion" className="text-gray-700">API Version</Label>
-                          <Input
-                            id="azureApiVersion"
-                            type="text"
-                            placeholder="2023-05-15"
-                            value={azureApiVersion}
-                            onChange={handleAzureApiVersionChange}
-                          />
-                          <p className="text-xs text-gray-500">Latest version is 2023-05-15</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    <div className="pt-4">
-                      <Button 
-                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                        onClick={() => setActiveTab("prompt")}
-                      >
-                        Apply & Return to Prompt
-                      </Button>
+                    <div 
+                      className={`border p-4 rounded-lg cursor-pointer transition-all ${useAzure ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200 hover:bg-gray-50'}`}
+                      onClick={() => setUseAzure(true)}
+                    >
+                      <div className="flex items-center mb-2">
+                        <div className={`w-4 h-4 rounded-full mr-2 ${useAzure ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                        <span className="font-medium">Azure OpenAI</span>
+                      </div>
+                      <p className="text-sm text-gray-500">Use with Azure OpenAI endpoints</p>
                     </div>
                   </div>
                 </div>
-              )}
+                
+                <Separator />
+                
+                {/* Standard OpenAI Settings */}
+                {!useAzure && (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-gray-800">OpenAI Settings</h3>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="apiKey" className="text-gray-700">API Key</Label>
+                      <div className="flex">
+                        <Input
+                          id="apiKey"
+                          type={showApiKey ? "text" : "password"}
+                          placeholder="Enter your OpenAI API key"
+                          value={apiKey}
+                          onChange={handleApiKeyChange}
+                          className="flex-1"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={handleToggleShowApiKey}
+                          className="ml-2 whitespace-nowrap"
+                        >
+                          {showApiKey ? "Hide Key" : "Show Key"}
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="model" className="text-gray-700">Model</Label>
+                      <Select value={selectedModel} onValueChange={handleModelChange}>
+                        <SelectTrigger id="model" className="w-full">
+                          <SelectValue placeholder="Select a model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
+                          <SelectItem value="gpt-4">GPT-4</SelectItem>
+                          <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Azure OpenAI Settings */}
+                {useAzure && (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-gray-800">Azure OpenAI Settings</h3>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="azureApiKey" className="text-gray-700">API Key</Label>
+                      <div className="flex">
+                        <Input
+                          id="azureApiKey"
+                          type={showApiKey ? "text" : "password"}
+                          placeholder="Enter your Azure OpenAI API key"
+                          value={apiKey}
+                          onChange={handleApiKeyChange}
+                          className="flex-1"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={handleToggleShowApiKey}
+                          className="ml-2 whitespace-nowrap"
+                        >
+                          {showApiKey ? "Hide Key" : "Show Key"}
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="azureEndpoint" className="text-gray-700">Azure Endpoint</Label>
+                      <Input
+                        id="azureEndpoint"
+                        type="text"
+                        placeholder="https://your-resource-name.openai.azure.com"
+                        value={azureEndpoint}
+                        onChange={handleAzureEndpointChange}
+                      />
+                      <p className="text-xs text-gray-500">Example: https://mistai2.openai.azure.com</p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="azureDeploymentName" className="text-gray-700">Deployment Name</Label>
+                      <Input
+                        id="azureDeploymentName"
+                        type="text"
+                        placeholder="Enter your model deployment name"
+                        value={azureDeploymentName}
+                        onChange={handleAzureDeploymentNameChange}
+                      />
+                      <p className="text-xs text-gray-500">The name of your deployed model in Azure</p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <Label htmlFor="azureApiVersion" className="text-gray-700">API Version</Label>
+                      <Input
+                        id="azureApiVersion"
+                        type="text"
+                        placeholder="2023-05-15"
+                        value={azureApiVersion}
+                        onChange={handleAzureApiVersionChange}
+                      />
+                      <p className="text-xs text-gray-500">Latest version is 2023-05-15</p>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="pt-4">
+                  <Button 
+                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    onClick={() => setActiveTab("prompt")}
+                  >
+                    Apply & Return to Prompt
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
