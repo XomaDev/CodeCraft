@@ -124,7 +124,10 @@ export default function CodeEditor() {
       setIsLoading(true);
       
       // Create OpenAI client with the API key
-      const openai = new OpenAI({ apiKey });
+      const openai = new OpenAI({ 
+        apiKey,
+        dangerouslyAllowBrowser: true // Allowing browser usage as requested
+      });
       
       // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       const response = await openai.chat.completions.create({
