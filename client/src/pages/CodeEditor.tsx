@@ -215,10 +215,10 @@ export default function CodeEditor() {
               </Button>
             </TabsContent>
             
-            <TabsContent value="settings" className="h-[calc(100%-40px)] flex flex-col overflow-y-auto">
-              <div className="space-y-4 bg-white p-4 rounded">
+            <TabsContent value="settings" className="h-[calc(100%-40px)]">
+              <div className="p-4 space-y-4 h-full overflow-y-auto">
                 <div className="space-y-2">
-                  <Label htmlFor="apiKey">OpenAI API Key</Label>
+                  <Label htmlFor="apiKey" className="text-gray-700">OpenAI API Key</Label>
                   <div className="flex">
                     <Input
                       id="apiKey"
@@ -240,7 +240,7 @@ export default function CodeEditor() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="model">Model</Label>
+                  <Label htmlFor="model" className="text-gray-700">Model</Label>
                   <Select value={selectedModel} onValueChange={handleModelChange}>
                     <SelectTrigger id="model">
                       <SelectValue placeholder="Select a model" />
@@ -257,7 +257,7 @@ export default function CodeEditor() {
                 
                 <div className="pt-4">
                   <Button 
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700"
+                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                     onClick={() => setActiveTab("prompt")}
                   >
                     Apply & Return to Prompt
