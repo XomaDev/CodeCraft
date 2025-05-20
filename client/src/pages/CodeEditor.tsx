@@ -191,7 +191,7 @@ export default function CodeEditor() {
       
       {/* Input Area - 30% of the screen height */}
       <div className="h-[30%] border-t border-gray-300 flex">
-        {/* Prompt/Input Area - 70% of the bottom panel */}
+        {/* Left panel - 70% of the bottom panel */}
         <div className="w-[70%] p-2 bg-[#f0f0f0] flex flex-col">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
             <TabsList className="grid w-full grid-cols-2">
@@ -215,40 +215,54 @@ export default function CodeEditor() {
               </Button>
             </TabsContent>
             
-            <TabsContent value="settings" className="h-[calc(100%-40px)] space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="apiKey">OpenAI API Key</Label>
-                <div className="flex">
-                  <Input
-                    id="apiKey"
-                    type={showApiKey ? "text" : "password"}
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={handleApiKeyChange}
-                    className="flex-1"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleToggleShowApiKey}
-                    className="ml-2"
+            <TabsContent value="settings" className="h-[calc(100%-40px)] flex flex-col overflow-y-auto">
+              <div className="space-y-4 bg-white p-4 rounded">
+                <div className="space-y-2">
+                  <Label htmlFor="apiKey">OpenAI API Key</Label>
+                  <div className="flex">
+                    <Input
+                      id="apiKey"
+                      type={showApiKey ? "text" : "password"}
+                      placeholder="Enter your OpenAI API key"
+                      value={apiKey}
+                      onChange={handleApiKeyChange}
+                      className="flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleToggleShowApiKey}
+                      className="ml-2"
+                    >
+                      {showApiKey ? "Hide" : "Show"}
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="model">Model</Label>
+                  <Select value={selectedModel} onValueChange={handleModelChange}>
+                    <SelectTrigger id="model">
+                      <SelectValue placeholder="Select a model" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
+                      <SelectItem value="gpt-4">GPT-4</SelectItem>
+                      <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                      <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="pt-4">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700"
+                    onClick={() => setActiveTab("prompt")}
                   >
-                    {showApiKey ? "Hide" : "Show"}
+                    Apply & Return to Prompt
                   </Button>
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="model">Model</Label>
-                <Select value={selectedModel} onValueChange={handleModelChange}>
-                  <SelectTrigger id="model">
-                    <SelectValue placeholder="Select a model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
-                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </TabsContent>
           </Tabs>
