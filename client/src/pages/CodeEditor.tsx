@@ -172,30 +172,10 @@ export default function CodeEditor() {
         });
       }
       
-      // The system prompt with language details
-      const systemPrompt = `You are an expert code generator. Generate only clean, working code without explanations or markdown formatting.
-        The code is for a custom language with the following syntax elements:
-        
-        Keywords: if, elif, else, func, let, glob, return, print, for, each, to, by, in, while, do, break
-        Math functions: root, abs, neg, log, exp, round, ceil, floor, sin, cos, tan, asin, acos, atan
-        Built-in functions: randInt, randFloat, min, max
-        Type identifiers: number, text, list, dict
-        Method calls: startsWith, contains, split, add, remove
-        Property access: textLen, trim, upper, lower, listLen, keys, values
-        
-        Operators: +, -, *, /, ^, =, <, >, !, == and other standard operators
-
-        When generating mathematical or algorithmic code, make sure to follow the syntax of this language. 
-        Do not generate code in any other language.`;
-      
-      // Send request to OpenAI
+      // Send request to OpenAI without additional context (using fine-tuned model)
       const response = await openaiClient.chat.completions.create({
         model: useAzure ? azureDeploymentName : selectedModel, // For Azure, the model is specified in the deployment
         messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
           {
             role: "user",
             content: inputValue
@@ -239,9 +219,9 @@ export default function CodeEditor() {
       </div>
       
       {/* Input Area - 30% of the screen height */}
-      <div className="h-[30%] border-t border-gray-300 flex">
-        {/* Left panel - 70% of the bottom panel */}
-        <div className="w-[70%] p-2 bg-[#f0f0f0]">
+      <div className="h-[30%] border-t border-gray-300">
+        {/* Full-width prompt/settings area */}
+        <div className="w-full p-2 bg-[#f0f0f0]">
           <div className="w-full h-full flex flex-col">
             <div className="flex border-b border-gray-300">
               <button 
@@ -427,39 +407,6 @@ export default function CodeEditor() {
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        </div>
-        
-        {/* Code Info Panel - 30% of the bottom panel */}
-        <div className="w-[30%] p-4 bg-white border-l border-gray-200 overflow-y-auto">
-          <h3 className="text-lg font-semibold mb-2">Language Reference</h3>
-          <Separator className="my-2" />
-          
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-medium text-indigo-600">Keywords</h4>
-              <p className="text-gray-600">if, elif, else, func, let, glob, return, print, for, each</p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-cyan-600">Math Functions</h4>
-              <p className="text-gray-600">sin, cos, tan, round, floor, ceil, abs, log, exp</p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-amber-600">Built-in Functions</h4>
-              <p className="text-gray-600">randInt, randFloat, min, max, avgOf</p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-purple-600">Type Identifiers</h4>
-              <p className="text-gray-600">number, text, list, dict</p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-green-600">Method Calls</h4>
-              <p className="text-gray-600">startsWith, contains, split, add, remove</p>
             </div>
           </div>
         </div>
