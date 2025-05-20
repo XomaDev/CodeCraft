@@ -84,13 +84,19 @@ export default function CodeEditor() {
       </div>
       
       {/* Input Area - 30% of the screen height */}
-      <div className="h-[30%] p-2 bg-[#f0f0f0] border-t border-gray-300">
+      <div className="h-[30%] p-2 bg-[#f0f0f0] border-t border-gray-300 flex flex-col">
         <textarea
-          className="w-full h-full p-3 bg-white border border-gray-200 rounded font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full flex-1 p-3 bg-white border border-gray-200 rounded-t font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
           placeholder="Input area..."
           value={inputValue}
           onChange={handleInputChange}
         />
+        <button 
+          className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-b hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          onClick={() => console.log("Generate button clicked")}
+        >
+          Generate
+        </button>
       </div>
     </div>
   );
