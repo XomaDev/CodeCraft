@@ -192,80 +192,96 @@ export default function CodeEditor() {
       {/* Input Area - 30% of the screen height */}
       <div className="h-[30%] border-t border-gray-300 flex">
         {/* Left panel - 70% of the bottom panel */}
-        <div className="w-[70%] p-2 bg-[#f0f0f0] flex flex-col">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="prompt">Prompt</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="prompt" className="h-[calc(100%-40px)] flex flex-col">
-              <textarea
-                className="w-full flex-1 p-3 bg-white border border-gray-200 rounded-t font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="Write me a fib function..."
-                value={inputValue}
-                onChange={handleInputChange}
-              />
-              <Button 
-                className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-b hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                onClick={generateCode}
-                disabled={isLoading}
+        <div className="w-[70%] p-2 bg-[#f0f0f0]">
+          <div className="w-full h-full flex flex-col">
+            <div className="flex border-b border-gray-300">
+              <button 
+                className={`flex-1 py-2 font-medium text-sm ${activeTab === 'prompt' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-800'}`}
+                onClick={() => setActiveTab('prompt')}
               >
-                {isLoading ? "Generating..." : "Generate"}
-              </Button>
-            </TabsContent>
+                Prompt
+              </button>
+              <button 
+                className={`flex-1 py-2 font-medium text-sm ${activeTab === 'settings' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-800'}`}
+                onClick={() => setActiveTab('settings')}
+              >
+                Settings
+              </button>
+            </div>
             
-            <TabsContent value="settings" className="h-[calc(100%-40px)]">
-              <div className="p-4 space-y-4 h-full overflow-y-auto">
-                <div className="space-y-2">
-                  <Label htmlFor="apiKey" className="text-gray-700">OpenAI API Key</Label>
-                  <div className="flex">
-                    <Input
-                      id="apiKey"
-                      type={showApiKey ? "text" : "password"}
-                      placeholder="Enter your OpenAI API key"
-                      value={apiKey}
-                      onChange={handleApiKeyChange}
-                      className="flex-1"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleToggleShowApiKey}
-                      className="ml-2"
-                    >
-                      {showApiKey ? "Hide" : "Show"}
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="model" className="text-gray-700">Model</Label>
-                  <Select value={selectedModel} onValueChange={handleModelChange}>
-                    <SelectTrigger id="model">
-                      <SelectValue placeholder="Select a model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
-                      <SelectItem value="gpt-4">GPT-4</SelectItem>
-                      <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                      <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                      <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="pt-4">
+            <div className="flex-1 relative">
+              {activeTab === 'prompt' && (
+                <div className="absolute inset-0 flex flex-col">
+                  <textarea
+                    className="w-full flex-1 p-3 bg-white border border-gray-200 rounded-t font-mono text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    placeholder="Write me a fib function..."
+                    value={inputValue}
+                    onChange={handleInputChange}
+                  />
                   <Button 
-                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                    onClick={() => setActiveTab("prompt")}
+                    className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-b hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    onClick={generateCode}
+                    disabled={isLoading}
                   >
-                    Apply & Return to Prompt
+                    {isLoading ? "Generating..." : "Generate"}
                   </Button>
                 </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+              )}
+              
+              {activeTab === 'settings' && (
+                <div className="absolute inset-0 p-4 overflow-y-auto bg-white rounded border border-gray-200">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="apiKey" className="text-gray-700">OpenAI API Key</Label>
+                      <div className="flex">
+                        <Input
+                          id="apiKey"
+                          type={showApiKey ? "text" : "password"}
+                          placeholder="Enter your OpenAI API key"
+                          value={apiKey}
+                          onChange={handleApiKeyChange}
+                          className="flex-1"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleToggleShowApiKey}
+                          className="ml-2"
+                        >
+                          {showApiKey ? "Hide" : "Show"}
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="model" className="text-gray-700">Model</Label>
+                      <Select value={selectedModel} onValueChange={handleModelChange}>
+                        <SelectTrigger id="model">
+                          <SelectValue placeholder="Select a model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="gpt-4o">GPT-4o (Latest)</SelectItem>
+                          <SelectItem value="gpt-4">GPT-4</SelectItem>
+                          <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo-16k">GPT-3.5 Turbo (16k)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <Button 
+                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded hover:from-blue-600 hover:to-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        onClick={() => setActiveTab("prompt")}
+                      >
+                        Apply & Return to Prompt
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         
         {/* Code Info Panel - 30% of the bottom panel */}
