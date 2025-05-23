@@ -18,6 +18,13 @@ export default function EditorContent({
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
 
+    const fontSizeTheme = EditorView.theme({
+        ".cm-scroller": {
+            fontSize: "20px !important", // <-- FORCE it
+            fontFamily: "monospace",
+        },
+    });
+
   useEffect(() => {
     if (editorRef.current && !viewRef.current) {
       const startState = EditorState.create({
@@ -27,6 +34,7 @@ export default function EditorContent({
           lightTheme,
           customLanguage,
           customSyntaxHighlighting,
+            fontSizeTheme,
           lineNumbers({
             formatNumber: (lineNo) => {
               return String(lineNo);
@@ -49,9 +57,9 @@ export default function EditorContent({
         state: startState,
         parent: editorRef.current,
       });
-      
+
       viewRef.current = view;
-      
+
       // Focus on the editor when it's loaded
       view.focus();
     }
@@ -78,7 +86,7 @@ export default function EditorContent({
 
   return (
     <div className="h-full w-full bg-[#f8f9fa]">
-      <div 
+      <div
         className="h-full w-full"
         ref={editorRef}
       />

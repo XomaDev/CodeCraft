@@ -29,6 +29,7 @@ export default function CodeEditor() {
   
   const handleCodeChange = (value: string) => {
     setCode(value);
+    window.parent.postMessage(value, "*");
   };
   
   const handleCursorActivity = (line: number, ch: number) => {
@@ -164,8 +165,8 @@ export default function CodeEditor() {
     <div className="h-screen flex flex-col">
       {/* Code Editor - 70% of the screen height */}
       <div className="h-[70%]">
-        <EditorContent 
-          code={code} 
+        <EditorContent
+          code={code}
           onChange={handleCodeChange} 
           onCursorActivity={handleCursorActivity} 
         />

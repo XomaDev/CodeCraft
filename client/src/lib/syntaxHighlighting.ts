@@ -70,7 +70,7 @@ export const customLanguage = StreamLanguage.define({
     }
     
     // Handle keywords
-    if (stream.match(/^(if|elif|else|func|let|glob|return|print|for|each|to|by|in|while|do|break|walkAll|color|var)\b/)) {
+    if (stream.match(/^(if|elif|else|func|let|global|for|each|to|by|in|while|do|break|walkAll|color|local|this)\b/)) {
       return "keyword";
     }
     
@@ -80,8 +80,8 @@ export const customLanguage = StreamLanguage.define({
     }
     
     // Check for built-in functions with parentheses (second group)
-    if (stream.match(/^(bin|octal|hexa|randInt|randFloat|setRandSeed|min|max|avgOf|maxOf|minOf|geoMeanOf|stdDevOf|stdErrOf|nodeOf|mod|rem|quot|aTan2|formatDecimal|println|openScreen|openScreenWithValue|controls_closeScreenWithValue|getStartValue|closeScreen|closeApp|getPlainStartText|copyList|copyDict|makeColor|splitColor)(?=\s*\()/)) {
-      return "def";  // Amber color
+    if (stream.match(/^(bin|octal|hexa|randInt|randFloat|setRandSeed|min|max|avgOf|maxOf|minOf|geoMeanOf|stdDevOf|stdErrOf|nodeOf|mod|rem|quot|aTan2|formatDecimal|println|openScreen|openScreenWithValue|controls_closeScreenWithValue|getStartValue|closeScreen|closeApp|getPlainStartText|copyList|copyDict|makeColor|splitColor)\b/)) {
+      return "atom";  // Amber color
     }
     
     // Check for type identifiers (third group)
@@ -91,20 +91,15 @@ export const customLanguage = StreamLanguage.define({
     
     // Check for method calls with dot notation (fourth group)
     const dotBefore = stream.string.slice(Math.max(0, stream.pos - 1), stream.pos) === ".";
-    if (dotBefore && stream.match(/(startsWith|contains|containsAny|containsAll|split|splitAtFirst|splitAtAny|splitAtFirstOfAny|segment|replace|replaceFrom|replaceFromLongestFirst|add|listContainsItem|indexOf|insert|remove|appendList|lookupInPairs|join|slice|get|set|delete|getAtPath|setAtPath|containsKey|mergeInto|walkTree)(?=\s*\()/)) {
+    if (dotBefore && stream.match(/(startsWith|contains|containsAny|containsAll|split|splitAtFirst|splitAtAny|splitAtFirstOfAny|segment|replace|replaceFrom|replaceFromLongestFirst|add|listContainsItem|indexOf|insert|remove|appendList|lookupInPairs|join|slice|get|set|delete|getAtPath|setAtPath|containsKey|mergeInto|walkTree|textLen|trim|upper|lower|splitAtSpaces|reverse|csvRowToList|csvTableToList|listLen|random|reverseList|toCsvRow|toCsvTable|sort|allButFirst|allButLast|pairsToDict|keys|values|dictLen|toPairs)(?=\s*\()/)) {
       return "meta";  // Green color
     }
     
-    // Check for property access without parentheses (fifth group)
-    if (dotBefore && stream.match(/(textLen|trim|upper|lower|splitAtSpaces|reverse|csvRowToList|csvTableToList|listLen|random|reverseList|toCsvRow|toCsvTable|sort|allButFirst|allButLast|pairsToDict|keys|values|dictLen|toPairs)(?!\s*\()/)) {
-      return "attribute";  // Blue color
-    }
+    //if (dotBefore && stream.match(/()(?!\s*\()/)) {
+      //return "attribute";  // Blue color
+    //}
     
-    // Handle function definitions
-    if (stream.match(/^func\s+([a-zA-Z_][a-zA-Z0-9_]*)/)) {
-      return "def";
-    }
-    
+
     // Handle numbers
     if (stream.match(/^-?\d+(\.\d+)?/)) {
       return "number";
